@@ -11,28 +11,26 @@ function calculateInterest(userId, accountId, startDate, endDate, mockBalanceHis
 
     // If user opened account on prior month, see what the last balance was at start of this month
     let balance = model.getBalanceOnDate(userId, accountId, startDate)
-    let total_interest = 0
+    let totalInterest = 0
 
-    let next_balance_event = accountBalanceHistory.shift()
+    let nextBalanceEvent = accountBalanceHistory.shift()
 
-    for (let day_of_month = 1; day_of_month < daysInMonth + 1; day_of_month++) {
-        let next_balance_event_day_of_month = next_balance_event ?
-            next_balance_event?.created_at?.getDate() :
+    for (let dayOfMonth = 1; dayOfMonth < daysInMonth + 1; dayOfMonth++) {
+        let nextBalanceEventDayOfMonth = nextBalanceEvent ?
+            nextBalanceEvent?.created_at?.getDate() :
             null
 
         // Check if balance changed on this day
-        if (day_of_month == next_balance_event_day_of_month) {
-            const balanceChange = next_balance_event.balance - balance
-            balance = next_balance_event.balance
-            // console.log(`Balance changed on day ${next_balance_event_day_of_month}. New balance: ${next_balance_event.balance}. Change: ${balanceChange}`)
-            next_balance_event = accountBalanceHistory.shift()
+        if (dayOfMonth == nextBalanceEventDayOfMonth) {
+            const balanceChange = nextBalanceEvent.balance - balance
+            balance = nextBalanceEvent.balance
+            nextBalanceEvent = accountBalanceHistory.shift()
         }
-        const daily_interest_charge = billingUtils.calculateDailyInterestCharge(balance)
-        total_interest += daily_interest_charge
-        // console.log(`Daily interest for day ${day_of_month} is ${daily_interest_charge}, running total: ${total_interest}`)
+        const dailyInterestCharge = billingUtils.calculateDailyInterestCharge(balance)
+        totalInterest += dailyInterestCharge
     }
-    const rounded_interest = Math.round(total_interest * 100) / 100
-    return rounded_interest
+    const roundedInterest = Math.round(totalInterest * 100) / 100
+    return roundedInterest
 }
 
 function checkTestCase(testCase) {
